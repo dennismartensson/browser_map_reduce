@@ -1,0 +1,48 @@
+<html>
+<head>
+	<script type="text/javascript">
+
+		window.onload = function() {
+			{{ function_to_run }}();
+		};
+
+      function map() {
+        var data = {{ job_content }}
+        sum = 0
+        for(var x in data){
+        	sum += data[x] * 2; 
+        }
+        emit('reduce', {'count': sum});
+      }
+
+      function reduce() {
+        var sum = 0;
+        var docs = {{ job_content }}
+        for(i = 0; i < docs.length; i++){
+        	sum += parseInt(docs[i]);
+        }
+        emit('finalize', {'sum': sum});
+      }
+
+      function emit(phase, data) {
+        var myForm = document.createElement("form");
+        myForm.method="GET";
+        myForm.action = "/emit/"+phase;
+
+        for (var k in data) {
+          var myInput = document.createElement("input");
+          myInput.setAttribute("name", k);
+          myInput.setAttribute("value", data[k]);
+          myForm.appendChild(myInput);
+        }
+
+        document.body.appendChild(myForm);
+        myForm.submit();
+        document.body.removeChild(myForm);
+      }
+    </script>
+</head>
+<body>
+{{ count }}
+</body>
+</html>
